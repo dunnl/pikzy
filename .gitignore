@@ -1,4 +1,5 @@
 .direnv/*
+*.png
 
 # BELOW LIES THE DEFAULT TEX.GITIGNORE
 
