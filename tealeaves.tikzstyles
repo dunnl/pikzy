@@ -13,14 +13,15 @@
 \tikzstyle{Comonad}=[fill={rgb,255: red,214; green,39; blue,40}, draw={rgb,255: red,214; green,39; blue,40}, shape=circle]
 \tikzstyle{Decoration}=[draw={rgb,255: red,31; green,119; blue,180}, fill={rgb,255: red,214; green,39; blue,40}, line width=2pt, shape=circle]
 \tikzstyle{Equals}=[fill=none, draw=none, font={\Huge}, shape=circle]
+\tikzstyle{PlainDecoration}=[fill={rgb,255: red,214; green,39; blue,40}, draw=black, shape=circle]
 
 % Edge styles
 \tikzstyle{Monad T}=[-, draw={rgb,255: red,31; green,119; blue,180}, line width=2pt]
 \tikzstyle{Decoration W}=[-, draw={rgb,255: red,214; green,39; blue,40}, line width=2pt]
 \tikzstyle{Applicative G1}=[-, draw={rgb,255: red,44; green,160; blue,44}, line width=2pt]
 \tikzstyle{Applicative G2}=[-, draw={rgb,255: red,44; green,160; blue,44}, line width=2pt]
-\tikzstyle{Plain}=[-, line width=1pt, tikzit draw={rgb,255: red,0; green,128; blue,128}]
+\tikzstyle{Plain}=[-, line width=2pt, tikzit draw={rgb,255: red,0; green,128; blue,128}]
 \tikzstyle{Border}=[-, tikzit draw=yellow, dashed]
 \tikzstyle{Arrow}=[->, draw={rgb,255: red,79; green,79; blue,79}]
 \tikzstyle{Dotted line}=[-, draw=black, dashed]
-\tikzstyle{Hidden}=[-, line width=0pt, draw=white]
+\tikzstyle{Hidden}=[-, line width=0pt, draw=white, tikzit draw=yellow]
