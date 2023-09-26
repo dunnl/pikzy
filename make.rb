@@ -1,39 +1,52 @@
+require 'erb'
+require 'tempfile'
+require 'fileutils'
+
 def command?(command)
   system("which #{command} > /dev/null 2>&1")
 end
 
-# Notice "\\usepackage" to avoid "\u"
-def oneTikzToPng (source)
-  document = <<-EOF
-    \\documentclass[convert={density=300,outext=.png}]{standalone}
-    \\usepackage{dsfont}
-    \\include{includes/macros}
-    \\usepackage{tikzit}
-    \\input{tealeaves.tikzstyles}
-    \\begin{document}
-    \\input{#{source}}
-    \\end{document}
-  EOF
-  puts "Called on source #{source}"
-  dir = File.dirname(source)[2...]
-  puts "Directory is #{dir}"
-  out = File.basename(source, ".tikz")
-  puts "Output file is #{out}"
+def oneTikzToPng (tikz_filename)
 
-  tmp = "tmp_#{out}.tex"
-  tmppng = "tmp_#{out}.png"
-  outpngdir = "_out/#{dir}"
-  outpng = "_out/#{dir}/#{out}.png"
+  template_fd = File.open("template.tex", "r")
+  template = ERB.new(template_fd.read()).result(binding)
+  template_fd.close()
 
-  fdout = File.open("#{tmp}", "w")
-  puts "Writing #{tmp}"
-  fdout.write(document)
-  puts "Closing file #{tmp}"
-  fdout.close
+  # Compute paths
+  basename = File.basename(tikz_filename, ".tikz") # Truncate .tikz
+  output_path = basename + ".png"
 
-  puts "DOING pdflatex --shell-escape #{tmp}; mkdir -p \"#{outpngdir}\"; mv #{tmppng} \"#{outpng}\""
-  Kernel.system("pdflatex --interaction=batchmode --shell-escape #{tmp} > /dev/null")
-  Kernel.system("mkdir -p \"#{outpngdir}\" && mv #{tmppng} \"#{outpng}\"")
+  Dir.mktmpdir {|dir|
+    FileUtils.cp(tikz_filename, "#{dir}")
+    FileUtils.cp("tealeaves.tikzstyles", "#{dir}")
+    FileUtils.cp("tikzit.sty", "#{dir}")
+
+  # By default this call appends random numbers to the .tex extension
+  # Unfortunately pdflatex cannot tolerate this!
+  # Pass a 2-argument array to Tempfile.new() to avoid this
+  #target = Tempfile.new(['target', '.tex'], '.')
+  target = File.open("#{dir}/#{basename}.tex", "w")
+  target_file = target.path()
+  target.write(template)
+  target.close()
+
+  puts "Converting .tikz file: #{tikz_filename}"
+  puts "Temporary .tex file: #{target_file}"
+  puts "Output file will be #{output_path}"
+  #puts template.result(binding)
+
+
+  Dir.chdir("#{dir}") do
+    build_command = "pdflatex -output-directory=#{dir} -interaction=batchmode -shell-escape #{target_file}"
+    #build_command = "pdflatex -output-directory=#{dir} -interaction=batchmode --shell-escape target.tex"
+    puts "Running " + build_command
+    Kernel.system(build_command)
+    #sleep(120)
+  end
+
+  #sleep(120)
+  FileUtils.cp("#{dir}/#{output_path}", ".")
+  }
 end
 
 filename = ARGV.first
