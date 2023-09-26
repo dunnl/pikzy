@@ -1,11 +1,15 @@
-% To make a PNG using imagemagick
 \documentclass[convert]{standalone}
-% To make a PDF only
-%\documentclass{standalone}
 \usepackage{tikzit}
 \input{tealeaves.tikzstyles}
-
 \begin{document}
+\input{<%= tikz_filename %>}
+\end{document}
+
+% To make a PNG using imagemagick
+%\documentclass[convert]{standalone}
+
+% To make a PDF only use
+%\documentclass{standalone}
 
 % This doesn't work in standalone
 %\begin{equation}
@@ -16,6 +20,4 @@
 %\ctikzfig{demo}
 
 % This works in standalone
-\input{demo.tikz}
-
-\end{document}
+%\input{<%= tikz_filename %>}
