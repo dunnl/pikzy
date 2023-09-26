@@ -5,22 +5,36 @@ end
 # Notice "\\usepackage" to avoid "\u"
 def oneTikzToPng (source)
   document = <<-EOF
-    \\documentclass[convert]{standalone}
+    \\documentclass[convert={density=300,outext=.png}]{standalone}
+    \\usepackage{dsfont}
+    \\include{includes/macros}
     \\usepackage{tikzit}
     \\input{tealeaves.tikzstyles}
     \\begin{document}
     \\input{#{source}}
     \\end{document}
   EOF
-  fdout = File.open("./tmp.tex", "w")
+  puts "Called on source #{source}"
+  dir = File.dirname(source)[2...]
+  puts "Directory is #{dir}"
+  out = File.basename(source, ".tikz")
+  puts "Output file is #{out}"
+
+  tmp = "tmp_#{out}.tex"
+  tmppng = "tmp_#{out}.png"
+  outpngdir = "_out/#{dir}"
+  outpng = "_out/#{dir}/#{out}.png"
+
+  fdout = File.open("#{tmp}", "w")
+  puts "Writing #{tmp}"
   fdout.write(document)
+  puts "Closing file #{tmp}"
   fdout.close
-  dir = File.dirname(source)
-  out = File.basename(source)
-  command = "pdflatex ./tmp.tex -output-directory #{}"
-  Kernel.spawn(command)
-  Kernel.spawn("mv standalone.png #{source}.png")
+
+  puts "DOING pdflatex --shell-escape #{tmp}; mkdir -p \"#{outpngdir}\"; mv #{tmppng} \"#{outpng}\""
+  Kernel.system("pdflatex --interaction=batchmode --shell-escape #{tmp} > /dev/null")
+  Kernel.system("mkdir -p \"#{outpngdir}\" && mv #{tmppng} \"#{outpng}\"")
 end
 
-oneTikzToPng ("demo.tikz")
-
+filename = ARGV.first
+oneTikzToPng(filename)
