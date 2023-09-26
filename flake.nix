@@ -12,6 +12,7 @@
             texstudio
             texlive.combined.scheme-full
             imagemagick
+            ruby
           ];
         };
       };
