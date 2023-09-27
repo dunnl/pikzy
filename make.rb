@@ -2,7 +2,7 @@ require 'erb'
 require 'tempfile'
 require 'fileutils'
 
-$template_directory = "./template/"
+TEMPLATE_DIR = "./template"
 
 def escape_spaces(input_string)
   # Use gsub to replace all spaces with '\ '
@@ -15,79 +15,81 @@ def command?(command)
   system("which #{command} > /dev/null 2>&1")
 end
 
-def oneTikzToPng (tikz_filename)
-  puts "oneTikzToPng: Called on #{tikz_filename}"
+def oneTikzToPng (tikz_path)
+  puts "oneTikzToPng: Called on #{tikz_path}"
 
-  # Compute some paths
-  original_dir = File.basename(Dir.getwd) # Current directory of script
-  tikz_dir = File.dirname(tikz_filename)
+  begin
+    # Compute some paths
+    tikz_dir = File.dirname(tikz_path)
+    basename = File.basename(tikz_path, ".tikz")
+    tikz_filename = basename + ".tikz"
+    png_filename = basename + ".png"
+    tex_filename = basename + ".tex"
+    template_filename = File.join(TEMPLATE_DIR, "template.tex")
 
-  basename = File.basename(tikz_filename, ".tikz")
-  base_tikz_filename = basename + ".tikz" # Strip leading directory
-  png_filename = basename + ".png"
-  tex_filename = basename + ".tex"
+    # Interpolate template.tex and write out the result
+    template_file = File.open(template_filename, "r")
+    template_contents = ERB.new(template_file.read()).result(binding)
+    template_file.close()
 
-  # Interpolate variables into template.tex
-  template_fd = File.open("#{$template_directory}/template.tex", "r")
-  template = ERB.new(template_fd.read()).result(binding)
-  template_fd.close()
+    # Open a temporary directory and copy all our files there
+    Dir.mktmpdir {|tmp|
+      puts "Creating temporary directory #{tmp}"
 
-  # Open a temporary directory and copy all our files there
-  Dir.mktmpdir {|dir|
-    puts "Copying template/ directory into temporary directory #{dir}"
-    FileUtils.cp_r("template/.", "#{dir}")
-    # The "/." is documented in the FileUtils
-    # It copies all the files instead of creating "template/" under #{dir}
+      puts "Copying contents of the \"./template\" directory"
+      FileUtils.cp_r("#{TEMPLATE_DIR}/.", tmp)
+      # N.B. Adding "/." copies the contents without creating "template/" under #{tmp}
 
-    puts "Copying `#{tikz_filename}` into temporary directory #{dir}"
-    FileUtils.cp("#{tikz_filename}", "#{dir}")
+      puts "Copying #{tikz_path}"
+      FileUtils.cp(tikz_path, tmp)
 
-    # By default this call appends random numbers to the .tex extension
-    # Unfortunately pdflatex cannot tolerate this!
-    # Pass a 2-argument array to Tempfile.new() to avoid this
-    #target = Tempfile.new(['target', '.tex'], '.')
+      build_command = ["pdflatex", "-output-directory=#{tmp}", "-interaction=nonstopmode", "-shell-escape", escape_spaces(tex_filename)]
+      #build_command = ["pdflatex", "-output-directory=#{tmp}", "-interaction=nonstopmode", escape_spaces(tex_filename)]
 
-    # Create interpolated file
-    target = File.open("#{dir}/#{tex_filename}", "w")
-    target.write(template)
-    target.close()
+      Dir.chdir("#{tmp}") do
+        puts "Moving inside temporary directory #{tmp}"
 
-    puts "Creating .tex file in temporary directory: #{target.path()}"
-    puts "Output file will be #{png_filename}"
+        # Write out interpolated .TeX file to compile
+        main_file = File.open(tex_filename, "w")
+        puts "Creating #{tex_filename} from template"
+        main_file.write(template_contents)
+        main_file.close()
 
-    build_command = "pdflatex -output-directory=#{dir} -interaction=nonstopmode -shell-escape #{escape_spaces(target.path())} > /dev/null"
+        puts "Running command: #{build_command.join(' ')}"
+        puts "Output file will be #{png_filename}"
 
-    Dir.chdir("#{dir}") do
-      puts "Inside temporary directory #{dir}"
-      puts "Running command: " + build_command
-      begin
-        Kernel.system(build_command)
-      rescue Errno::ENOENT => e
-        puts "Caught ENOENT exception: #{e.message}"
-      rescue => e
-        puts "Caught unknown exception: #{e.message}"
+        unless(system(*build_command, in: '/dev/null', out: '/dev/null'))
+          exit_status = $?.exitstatus
+          raise "Build command returned non-zero status: #{exit_status}"
+        end
       end
-    end
 
-    puts "Copying #{dir}/#{png_filename} to _out/"
-    outdir = "_out/#{tikz_dir}/"
-    FileUtils.mkdir_p(outdir)
-    FileUtils.cp("#{dir}/#{png_filename}", "#{outdir}")
-    puts "**************************************************************************"
-  }
+      outdir = File.join("_out", tikz_dir)
+      puts "Back to original working directory. Copying #{png_filename} to #{outdir}"
+      FileUtils.mkdir_p(outdir)
+      FileUtils.cp("#{tmp}/#{png_filename}", "#{outdir}")
+    }
+  rescue Errno::ENOENT => e
+    puts "Caught ENOENT exception: #{e.message}"
+  rescue RuntimeError => e
+    puts "Runtime error: #{e.message}"
+  rescue => e
+    puts "Caught unknown exception: #{e.message}"
+  end
+  puts "**************************************************************************"
 end
 
 def manyTikzToPng (tikz_filenames)
-     tikz_filenames.each {|x|
-      puts "Calling on #{x}"
-      oneTikzToPng("#{x}")
-    }
+  tikz_filenames.each {|x|
+    puts "Calling on #{x}"
+    oneTikzToPng("#{x}")
+  }
 end
 
 def fileTikzToPng(tikz_filenames_file)
-     File.readlines("#{tikz_filenames_file}", chomp: true).each do |line|
-      oneTikzToPng("#{line}")
-    end
+  File.readlines("#{tikz_filenames_file}", chomp: true).each do |line|
+    oneTikzToPng("#{line}")
+  end
 end
 
 
