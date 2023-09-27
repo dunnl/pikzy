@@ -1,0 +1,71 @@
+% Misc
+\newcommand{\comp}{\cdot}
+\newcommand{\id}[1]{\mathrm{id}_{#1}}
+\newcommand{\typTyp}[1]{\mathrm{#1}}
+\newcommand{\coq}[1]{{\normalfont \texttt{#1}}} % Used to avoid math-mode italicizing everything
+\newcommand{\smallcoq}[1]{{\texttt{#1}}} % Used for small text in footnotes
+\newcommand{\strength}{\mathrm{st}}
+\newcommand{\idfun}{\mathds{1}}
+
+% Specific operations
+\newcommand{\extr}[2]{\mathrm{extr}^{#1}_{#2}}
+\newcommand{\del}[2]{\mathrm{del}^{#1}_{#2}}
+\newcommand{\dup}[2]{\mathrm{dup}^{#1}_{#2}}
+\newcommand{\preincr}{\mathrm{preincr}}
+
+% Category-theoretic operations
+\newcommand{\map}[2]{\mathrm{map}^{#1}_{#2}}
+\newcommand{\ret}[2]{\mathrm{ret}^{#1}_{#2}}
+\newcommand{\join}[2]{\mathrm{join}^{#1}_{#2}}
+\newcommand{\dec}[2]{\mathrm{dec}^{#1}_{#2}}
+\newcommand{\dist}[2]{\mathrm{dist}^{#1}_{#2}}
+\newcommand{\pure}[2]{\mathrm{pure}^{#1}_{#2}}
+
+% Kleisli operations
+\newcommand{\bind}[2]{\mathrm{bind}^{#1}_{#2}}
+\newcommand{\binddt}[2]{\mathrm{binddt}^{#1}_{#2}}
+
+% Categories
+\newcommand{\Set}{\mathbf{Set}}
+\newcommand{\SET}{\mathbf{Set}}
+\newcommand{\EndSet}{\mathbf{End}_{\mathrm{Set}}}
+\newcommand{\Dec}[1]{\mathbf{Dec}_{#1}}
+\newcommand{\Trav}{\mathbf{Trav}}
+\newcommand{\DecTrav}[1]{\mathbf{DecTrav}_{#1}}
+
+% Functors and types
+\newcommand{\funF}{\mathrm{F}}
+\newcommand{\funG}{\mathrm{G}}
+\newcommand{\funT}{\mathrm{T}}
+\newcommand{\typA}{\mathrm{A}}
+\newcommand{\typB}{\mathrm{B}}
+\newcommand{\typC}{\mathrm{C}}
+\newcommand{\typE}{\mathrm{E}}
+\newcommand{\typW}{\mathrm{W}}
+
+\newcommand{\product}[1]{#1 \times}
+\newcommand{\writerLong}{\mathrm{W} \times -}
+\newcommand{\writerShort}{\typW \times}
+\newcommand{\writer}{\typW \times}
+\newcommand{\typFn}[1]{\mathrm{#1}}
+
+% Term constructors?
+\newcommand{\term}[1]{\coq{term}_{#1}}
+\newcommand{\App}{\coq{App}}
+\newcommand{\Abs}{\coq{Lam}}
+\newcommand{\Var}{\coq{Var}}
+\newcommand{\Lam}{\coq{Lam}}
+
+% Locally nameless variables
+\newcommand{\fvar}{\coq{fvar}}
+\newcommand{\bvar}{\coq{bvar}}
+\newcommand{\LNvar}{\mathbb{A} + \mathbb{N}}
+
+% Locally nameless operations
+\newcommand{\LC}{\mathrm{LC}}
+\newcommand{\LCloc}{\mathrm{LC}_{\mathrm{loc}}}
+\newcommand{\open}{\mathrm{open}}
+\newcommand{\openloc}{\mathrm{open}_{\mathrm{loc}}}
+\newcommand{\subst}{\mathrm{subst}}
+\newcommand{\substloc}{\mathrm{subst}_{\mathrm{loc}}}
+\newcommand{\shift}{\mathrm{shift}}

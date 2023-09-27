@@ -1,8 +1,10 @@
 \documentclass[convert]{standalone}
 \usepackage{tikzit}
 \input{tealeaves.tikzstyles}
+\input{macros}
+\usepackage{dsfont}
 \begin{document}
-\input{<%= tikz_filename %>}
+\input{"<%= base_tikz_filename %>"}
 \end{document}
 
 % To make a PNG using imagemagick

@@ -25,3 +25,4 @@
 \tikzstyle{Arrow}=[->, draw={rgb,255: red,79; green,79; blue,79}]
 \tikzstyle{Dotted line}=[-, draw=black, dashed]
 \tikzstyle{Hidden}=[-, line width=0pt, draw=white, tikzit draw=yellow]
+\tikzstyle{Frame}=[-, line width=1.4pt, draw=none, tikzit draw=yellow, dashed]
